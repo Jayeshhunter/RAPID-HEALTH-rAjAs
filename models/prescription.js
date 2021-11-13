@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
       name: String,
       frequency: String,
       foodStat: String,
-      quantity: Number,
+      quantity: String,
       duration: Number,
       fromDate: Number,
       endDate: Number,

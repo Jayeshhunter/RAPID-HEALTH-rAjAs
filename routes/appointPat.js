@@ -15,5 +15,8 @@ router.post("/getMyAppoint", checkPat, appPatController.getAllAppoints);
 router.post("/getSingleAppoint", checkPat, appPatController.getSingleAppoint);
 router.post("/getMyDisease", checkPat, appPatController.getMyDisease);
 router.get("/medicine/:id", checkPat, appPatController.medicine);
+router.get("/history", checkPat, appPatController.history);
+router.get("/pharmacies/:location", checkPat, appPatController.pharmacies);
+//previous appointment and prescription
 
 module.exports = router;

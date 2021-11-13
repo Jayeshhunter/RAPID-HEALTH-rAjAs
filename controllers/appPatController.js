@@ -99,6 +99,26 @@ module.exports.addAppoint = async (req, res) => {
       data: "",
     };
 
+    const data2 = JSON.stringify({
+      phone: "+919798833522",
+      text: `Appointment details: 
+      Reason : ${reason} \n
+      Meeting Url : ${meetUrl} \n
+      TokenNumber : ${totalNumber + 1} \n
+      Appointment date : ${appointmentDate} \n
+      Diagnosis : ${diagnosis},`,
+    });
+
+    const config2 = {
+      method: "post",
+      url: "https://rapidapi.rmlconnect.net/wbm/v1/message",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "617bf2db245383001100f899",
+      },
+      data: data2,
+    };
+
     const results = await Promise.all([
       appoint.create({
         appointId,
@@ -113,7 +133,11 @@ module.exports.addAppoint = async (req, res) => {
       patient.findByIdAndUpdate(req.user._id, {
         $push: { appointMents: appointId },
       }),
+      doctor.findByIdAndUpdate(doctorId, {
+        $push: { appointMents: appointId },
+      }),
       axios(config),
+      axios(config2),
     ]);
 
     res.status(200).json({ status: "done", details: results[0] });
@@ -206,5 +230,40 @@ module.exports.getMyDisease = async (req, res) => {
       });
   } catch (e) {
     res.status(404).json({ error: e.message });
+  }
+};
+module.exports.history = async (req, res) => {
+  try {
+    const result = await Promise.all([
+      appoint.find({ patientId: req.user._id }),
+      presc.find({ patientId: req.user._id }),
+    ]);
+    const prevApp = result[0].filter((val) => {
+      if (new Date().getTime() > val.appointmentDate.getTime()) {
+        return val;
+      }
+    });
+    res.status(200).json({ prev: prevApp, presc: result[1] });
+  } catch (e) {
+    res.status(404).json({ error: e.message });
+  }
+};
+
+module.exports.pharmacies = async (req, res) => {
+  const location = req.params.location;
+  try {
+    const config = {
+      method: "GET",
+      url: "https://justdial-jd-unofficial.p.rapidapi.com/search",
+      params: { search_term: "pharmacy", location: location, page_number: "1" },
+      headers: {
+        "x-rapidapi-host": "justdial-jd-unofficial.p.rapidapi.com",
+        "x-rapidapi-key": "2aa5e5eb32msh88f9422e4f8e2b1p1f38cbjsn6c608a4f3740",
+      },
+    };
+    const resp = await axios(config);
+    res.status(200).json({ pharmacies: resp.data });
+  } catch (err) {
+    res.status(404).json({ error: err.message });
   }
 };

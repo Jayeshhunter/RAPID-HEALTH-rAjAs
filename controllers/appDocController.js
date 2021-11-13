@@ -30,9 +30,13 @@ module.exports.addPrescription = async (req, res) => {
   try {
     medicine.map((val) => {
       return {
-        ...val,
+        name: val.name,
+        frequency: val.frequency,
+        foodStat: val.foodStat,
+        quantity: val.quantity,
+        duration: val.duration,
         fromDate: new Date().getTime(),
-        endDate: new Date().getTime() + 1,
+        endDate: new Date().getTime() + val.duration,
       };
     });
 
@@ -51,6 +55,26 @@ module.exports.addPrescription = async (req, res) => {
         $push: { medAlert: { $each: medicine } },
       }),
     ]);
+
+    const data3 = JSON.stringify({
+      phone: "+919798833522",
+      text: `Prescription : \n
+      current Diagnosis: ${result[0].curDiagnosis} \n 
+      medicine: ${result[0].medicine} \n testRequired: ${result[0].testRequired}`,
+    });
+
+    const config3 = {
+      method: "post",
+      url: "https://rapidapi.rmlconnect.net/wbm/v1/message",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "617bf2db245383001100f899",
+      },
+      data: data3,
+    };
+
+    const resultAx = await axios(config3);
+
     cron.schedule("0 0 10 * * *", async () => {
       medicine.map(async (val) => {
         if (
@@ -91,8 +115,25 @@ module.exports.addPrescription = async (req, res) => {
             },
             data: body,
           };
+          const data2 = JSON.stringify({
+            phone: "+919798833522",
+            text: `Medicine reminder: 
+            name: ${val.name} ,quantity: ${val.quantity} and frequency: ${val.frequency}`,
+          });
 
-          const response = await axios(config);
+          const config2 = {
+            method: "post",
+            url: "https://rapidapi.rmlconnect.net/wbm/v1/message",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "617bf2db245383001100f899",
+            },
+            data: data2,
+          };
+
+          const resultAx = await Promise.all([axios(config), axios(config2)]);
+
+          // const response = await axios(config);
         }
       });
 
@@ -101,13 +142,13 @@ module.exports.addPrescription = async (req, res) => {
 
     res.status(200).json({ prescription: result[0] });
   } catch (err) {
-    res.status(401).json({ error: "Error" });
+    res.status(401).json({ error: err.message });
   }
 };
 module.exports.getPrescription = async function (req, res) {
   const { id } = req.body;
   try {
-    const pres = await prescription.findById(id);
+    const pres = await prescription.findOne({ appointId: id });
     res.status(200).json({ prescription: pres });
   } catch (err) {
     res.status(401).json({ error: "Error" });
@@ -115,9 +156,9 @@ module.exports.getPrescription = async function (req, res) {
 };
 
 module.exports.allAppointments = async function (req, res) {
-  const { doctorId } = req.body;
+  // const { doctorId } = req.body;
   try {
-    const allApp = await appoint.find({ doctorId });
+    const allApp = await appoint.find({ doctorId: req.user._id });
     res.status(200).json({ appointment: allApp });
   } catch (err) {
     res.status(401).json({ error: "Error" });
@@ -134,6 +175,10 @@ module.exports.reschedule = async function (req, res) {
         rescheduledAt: status,
         approved: true,
         rescheduleReas,
+      },
+      {
+        returnOriginal: false,
+        new: true,
       }
     );
     res.status(200).json({ message: appo });
@@ -149,6 +194,10 @@ module.exports.pendSt = async function (req, res) {
       {
         status,
         //status after completion
+      },
+      {
+        returnOriginal: false,
+        new: true,
       }
     );
     res.status(200).json({ message: appo });

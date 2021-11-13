@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   lat: { type: String, required: true },
   long: { type: String, required: true },
   appointMents: { type: [String], default: [] },
-  medAlert: { type: [String], default: [] },
+  medAlert: [],
 });
 
 userSchema.statics.login = async function (email) {
