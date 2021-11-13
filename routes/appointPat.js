@@ -11,12 +11,13 @@ const { checkPat } = require("../middlewares/patAuth");
 
 router.post("/getDocData", checkPat, appPatController.getDocData);
 router.post("/addAppoint", checkPat, appPatController.addAppoint);
-router.post("/getMyAppoint", checkPat, appPatController.getAllAppoints);
+router.get("/getMyAppoint", checkPat, appPatController.getAllAppoints);
 router.post("/getSingleAppoint", checkPat, appPatController.getSingleAppoint);
 router.post("/getMyDisease", checkPat, appPatController.getMyDisease);
 router.get("/medicine/:id", checkPat, appPatController.medicine);
 router.get("/history", checkPat, appPatController.history);
 router.get("/pharmacies/:location", checkPat, appPatController.pharmacies);
+router.get("/labs/:location", checkPat, appPatController.labs);
 //previous appointment and prescription
 
 module.exports = router;

@@ -148,7 +148,7 @@ module.exports.addAppoint = async (req, res) => {
 module.exports.getAllAppoints = async function (req, res) {
   try {
     if (req.user.appointMents.length > 0) {
-      const allAppoint = await appoint.findOne({ patientId: req.user._id });
+      const allAppoint = await appoint.find({ patientId: req.user._id });
       const upcomingAppoints = allAppoint.filter(
         (appoint) => appoint.appointmentDate.getTime() >= new Date().getTime()
       );
@@ -263,6 +263,24 @@ module.exports.pharmacies = async (req, res) => {
     };
     const resp = await axios(config);
     res.status(200).json({ pharmacies: resp.data });
+  } catch (err) {
+    res.status(404).json({ error: err.message });
+  }
+};
+module.exports.labs = async function (req, res) {
+  const location = req.params.location;
+  try {
+    const config = {
+      method: "GET",
+      url: "https://justdial-jd-unofficial.p.rapidapi.com/search",
+      params: { search_term: "labs", location: location, page_number: "1" },
+      headers: {
+        "x-rapidapi-host": "justdial-jd-unofficial.p.rapidapi.com",
+        "x-rapidapi-key": "2aa5e5eb32msh88f9422e4f8e2b1p1f38cbjsn6c608a4f3740",
+      },
+    };
+    const resp = await axios(config);
+    res.status(200).json({ labs: resp.data });
   } catch (err) {
     res.status(404).json({ error: err.message });
   }
