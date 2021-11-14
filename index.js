@@ -12,9 +12,7 @@ const rateLimit = require("express-rate-limit");
 const app = express();
 
 app.use(methodOverride("_method"));
-// parse application/x-www-form-urlencoded
 
-// mongodb+srv://creamzo:Hibricks@cluster0.vbywy.mongodb.net/creamzo
 mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
