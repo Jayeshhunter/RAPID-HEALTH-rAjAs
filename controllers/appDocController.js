@@ -11,12 +11,11 @@ const Grid = require("gridfs-stream");
 const axios = require("axios");
 const nodemailer = require("nodemailer");
 const { OAuth2Client } = require("google-auth-library");
-const client = new OAuth2Client(
-  "171125153728-pd31fnftkqiq4o3803lgt6p9dhmodn21.apps.googleusercontent.com"
-);
+
 const appoint = require("../models/appointment");
 const cron = require("node-cron");
-
+require("dotenv").config();
+const client = new OAuth2Client(process.env.VERIFY_ID);
 module.exports.addPrescription = async (req, res) => {
   const {
     patientId,
@@ -65,10 +64,10 @@ module.exports.addPrescription = async (req, res) => {
 
     const config3 = {
       method: "post",
-      url: "https://rapidapi.rmlconnect.net/wbm/v1/message",
+      url: process.env.RAPID_WBM,
       headers: {
         "Content-Type": "application/json",
-        Authorization: "617bf2db245383001100f899",
+        Authorization: process.env.AUTH_TOKEN,
       },
       data: data3,
     };
@@ -82,14 +81,14 @@ module.exports.addPrescription = async (req, res) => {
           new Date().getTime() <= val.endDate
         ) {
           const body = JSON.stringify({
-            owner_id: "69280678",
-            token: "MRLHgUrU7GQMjn7ZLJPTH3Tn",
-            smtp_user_name: "smtp70171761",
+            owner_id: process.env.OWNER_ID,
+            token: process.env.MAIL_TOKEN,
+            smtp_user_name: process.env.SMTP_USERNAME,
             message: {
               html: `Hi this is a medical reminder for name: ${val.name} ,quantity: ${val.quantity} and frequency: ${val.frequency}`,
               text: "Hello this is a test",
               subject: "example subject",
-              from_email: "noreply@rapidemail.rmlconnect.net",
+              from_email: process.env.RAPID_EMAIL,
               from_name: "rAjAs",
               to: [
                 {
@@ -99,7 +98,7 @@ module.exports.addPrescription = async (req, res) => {
                 },
               ],
               headers: {
-                "Reply-To": "noreply@rapidemail.rmlconnect.net",
+                "Reply-To": process.env.RAPID_EMAIL,
                 "X-Unique-Id": "id ",
               },
             },
@@ -107,7 +106,7 @@ module.exports.addPrescription = async (req, res) => {
 
           const config = {
             method: "post",
-            url: "https://rapidemail.rmlconnect.net/v1.0/messages/sendMail",
+            url: process.env.RAPID_MAILURL,
             headers: {
               "Reply-To": "message.reply@example.com",
               "X-Unique-Id": "id",
@@ -123,10 +122,10 @@ module.exports.addPrescription = async (req, res) => {
 
           const config2 = {
             method: "post",
-            url: "https://rapidapi.rmlconnect.net/wbm/v1/message",
+            url: process.env.RAPID_WBM,
             headers: {
               "Content-Type": "application/json",
-              Authorization: "617bf2db245383001100f899",
+              Authorization: process.env.AUTH_TOKEN,
             },
             data: data2,
           };

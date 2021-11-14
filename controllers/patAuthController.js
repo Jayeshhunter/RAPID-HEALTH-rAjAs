@@ -9,9 +9,7 @@ const Grid = require("gridfs-stream");
 const axios = require("axios");
 const nodemailer = require("nodemailer");
 const { OAuth2Client } = require("google-auth-library");
-const client = new OAuth2Client(
-  "171125153728-pd31fnftkqiq4o3803lgt6p9dhmodn21.apps.googleusercontent.com"
-);
+const client = new OAuth2Client(process.env.VERIFY_ID);
 const doctor = require("./../models/doctor");
 const appoint = require("./../models/appointment");
 require("dotenv").config();
@@ -20,7 +18,7 @@ const saltRounds = 10;
 
 const maxAge = 8 * 24 * 60 * 60;
 const createToken = function (id) {
-  return jwt.sign({ id }, "secretkey", {
+  return jwt.sign({ id }, process.env.SECRET_KEY, {
     expiresIn: maxAge,
   });
 };
@@ -38,14 +36,14 @@ module.exports.generate_otp = async (req, res) => {
   try {
     const uid = Math.floor(1000 + Math.random() * 9000);
     const body = JSON.stringify({
-      owner_id: "69280678",
-      token: "MRLHgUrU7GQMjn7ZLJPTH3Tn",
-      smtp_user_name: "smtp70171761",
+      owner_id: process.env.OWNER_ID,
+      token: process.env.MAIL_TOKEN,
+      smtp_user_name: process.env.SMTP_USERNAME,
       message: {
         html: `${uid}`,
         text: "Hello this is a test",
         subject: "example subject",
-        from_email: "noreply@rapidemail.rmlconnect.net",
+        from_email: process.env.RAPID_EMAIL,
         from_name: "rAjAs",
         to: [
           {
@@ -55,7 +53,7 @@ module.exports.generate_otp = async (req, res) => {
           },
         ],
         headers: {
-          "Reply-To": "noreply@rapidemail.rmlconnect.net",
+          "Reply-To": process.env.RAPID_EMAIL,
           "X-Unique-Id": "id ",
         },
       },
@@ -63,7 +61,7 @@ module.exports.generate_otp = async (req, res) => {
 
     const config = {
       method: "post",
-      url: "https://rapidemail.rmlconnect.net/v1.0/messages/sendMail",
+      url: process.env.RAPID_MAILURL,
       headers: {
         "Reply-To": "message.reply@example.com",
         "X-Unique-Id": "id",
@@ -111,8 +109,7 @@ module.exports.google_post = (req, res) => {
   client
     .verifyIdToken({
       idToken,
-      audience:
-        "171125153728-pd31fnftkqiq4o3803lgt6p9dhmodn21.apps.googleusercontent.com",
+      audience: process.env.VERIFY_ID,
     })
     .then((response) => {
       const { email_verified, name, email } = response.payload;
@@ -181,14 +178,14 @@ module.exports.forgot_post = async (req, res) => {
     //  uid to be replaced with url of the frontend forgot
     const user = await User.login(email);
     const body = JSON.stringify({
-      owner_id: "69280678",
-      token: "MRLHgUrU7GQMjn7ZLJPTH3Tn",
-      smtp_user_name: "smtp70171761",
+      owner_id: process.env.OWNER_ID,
+      token: process.env.MAIL_TOKEN,
+      smtp_user_name: process.env.SMTP_USERNAME,
       message: {
         html: `${uid}`,
         text: "Hello this is a test",
         subject: "example subject",
-        from_email: "noreply@rapidemail.rmlconnect.net",
+        from_email: process.env.RAPID_EMAIL,
         from_name: "rAjAs",
         to: [
           {
@@ -198,7 +195,7 @@ module.exports.forgot_post = async (req, res) => {
           },
         ],
         headers: {
-          "Reply-To": "noreply@rapidemail.rmlconnect.net",
+          "Reply-To": process.env.RAPID_EMAIL,
           "X-Unique-Id": "id ",
         },
       },
@@ -206,7 +203,7 @@ module.exports.forgot_post = async (req, res) => {
 
     const config = {
       method: "post",
-      url: "https://rapidemail.rmlconnect.net/v1.0/messages/sendMail",
+      url: process.env.RAPID_MAILURL,
       headers: {
         "Reply-To": "message.reply@example.com",
         "X-Unique-Id": "id",

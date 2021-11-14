@@ -1,3 +1,4 @@
+require("dotenv").config();
 const User = require("../models/doctor");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -10,10 +11,7 @@ const axios = require("axios");
 
 const nodemailer = require("nodemailer");
 const { OAuth2Client } = require("google-auth-library");
-const client = new OAuth2Client(
-  "171125153728-pd31fnftkqiq4o3803lgt6p9dhmodn21.apps.googleusercontent.com"
-);
-require("dotenv").config();
+const client = new OAuth2Client(process.env.VERIFY_ID);
 
 const doctor = require("./../models/doctor");
 const appoint = require("./../models/appointment");
@@ -89,7 +87,9 @@ module.exports.addAppoint = async (req, res) => {
 
     const config = {
       method: "get",
-      url: `https://rapidapi.rmlconnect.net:9443/bulksms/bulksms?username=rapid-Vo0c4020810000&password=617bf2db245383001100f899&type=0&dlr=1&destination=+919798833522&source=RMLPRD&message=Appointment details: ${appointId}, ${reason},
+      url:
+        process.env.BULK_SMS +
+        `Appointment details: ${appointId}, ${reason},
       ${meetUrl},
       ${totalNumber + 1},
       ${appointmentDate},
@@ -111,10 +111,10 @@ module.exports.addAppoint = async (req, res) => {
 
     const config2 = {
       method: "post",
-      url: "https://rapidapi.rmlconnect.net/wbm/v1/message",
+      url: process.env.RAPID_WBM,
       headers: {
         "Content-Type": "application/json",
-        Authorization: "617bf2db245383001100f899",
+        Authorization: process.env.AUTH_TOKEN,
       },
       data: data2,
     };
@@ -199,11 +199,11 @@ module.exports.getMyDisease = async (req, res) => {
   try {
     const config = {
       method: "GET",
-      url: "https://priaid-symptom-checker-v1.p.rapidapi.com/issues",
+      url: process.env.SYMPTOM_URL,
       params: { language: "en-gb" },
       headers: {
-        "x-rapidapi-host": "priaid-symptom-checker-v1.p.rapidapi.com",
-        "x-rapidapi-key": "2aa5e5eb32msh88f9422e4f8e2b1p1f38cbjsn6c608a4f3740",
+        "x-rapidapi-host": process.env.RAPIDAPI_HOST,
+        "x-rapidapi-key": process.env.RAPIDAPI_KEY,
       },
     };
 
@@ -215,12 +215,11 @@ module.exports.getMyDisease = async (req, res) => {
         const disId = firstData.find(({ Name }) => Name === searchData);
         const options = {
           method: "GET",
-          url: `https://priaid-symptom-checker-v1.p.rapidapi.com/issues/${disId.ID}/info`,
+          url: process.env.SYMPTOM_URL + `/${disId.ID}/info`,
           params: { language: "en-gb" },
           headers: {
-            "x-rapidapi-host": "priaid-symptom-checker-v1.p.rapidapi.com",
-            "x-rapidapi-key":
-              "2aa5e5eb32msh88f9422e4f8e2b1p1f38cbjsn6c608a4f3740",
+            "x-rapidapi-host": process.env.RAPIDAPI_HOST,
+            "x-rapidapi-key": process.env.RAPIDAPI_KEY,
           },
         };
         await axios(options).then((response) => {
@@ -254,11 +253,11 @@ module.exports.pharmacies = async (req, res) => {
   try {
     const config = {
       method: "GET",
-      url: "https://justdial-jd-unofficial.p.rapidapi.com/search",
+      url: process.env.JD_URL,
       params: { search_term: "pharmacy", location: location, page_number: "1" },
       headers: {
-        "x-rapidapi-host": "justdial-jd-unofficial.p.rapidapi.com",
-        "x-rapidapi-key": "2aa5e5eb32msh88f9422e4f8e2b1p1f38cbjsn6c608a4f3740",
+        "x-rapidapi-host": process.env.JDRAPIDAPI_HOST,
+        "x-rapidapi-key": process.env.JDRAPIDAPI_KEY,
       },
     };
     const resp = await axios(config);
@@ -272,11 +271,11 @@ module.exports.labs = async function (req, res) {
   try {
     const config = {
       method: "GET",
-      url: "https://justdial-jd-unofficial.p.rapidapi.com/search",
+      url: process.env.JD_URL,
       params: { search_term: "labs", location: location, page_number: "1" },
       headers: {
-        "x-rapidapi-host": "justdial-jd-unofficial.p.rapidapi.com",
-        "x-rapidapi-key": "2aa5e5eb32msh88f9422e4f8e2b1p1f38cbjsn6c608a4f3740",
+        "x-rapidapi-host": process.env.JDRAPIDAPI_HOST,
+        "x-rapidapi-key": process.env.JDRAPIDAPI_KEY,
       },
     };
     const resp = await axios(config);
