@@ -32,47 +32,64 @@ conn.once("open", () => {
 });
 
 module.exports.generate_otp = async (req, res) => {
-  const { email } = req.body;
+  const { email, type } = req.body;
   try {
     const uid = Math.floor(1000 + Math.random() * 9000);
-    const body = JSON.stringify({
-      owner_id: process.env.OWNER_ID,
-      token: process.env.MAIL_TOKEN,
-      smtp_user_name: process.env.SMTP_USERNAME,
-      message: {
-        html: `${uid}`,
-        text: "Hello this is a test",
-        subject: "example subject",
-        from_email: process.env.RAPID_EMAIL,
-        from_name: "rAjAs",
-        to: [
-          {
-            email: `${email}`,
-            name: "Jayesh Jayanandan",
-            type: "to",
+    switch (type) {
+      case "sms":
+        const config2 = {
+          method: "get",
+          url: process.env.BULK_SMS + `otp: ${uid}`,
+          headers: {},
+          data: "",
+        };
+        const respo = await axios(config2);
+        break;
+
+      case "email":
+        const body = JSON.stringify({
+          owner_id: process.env.OWNER_ID,
+          token: process.env.MAIL_TOKEN,
+          smtp_user_name: process.env.SMTP_USERNAME,
+          message: {
+            html: `${uid}`,
+            text: "Hello this is a test",
+            subject: "example subject",
+            from_email: process.env.RAPID_EMAIL,
+            from_name: "rAjAs",
+            to: [
+              {
+                email: `${email}`,
+                name: "Jayesh Jayanandan",
+                type: "to",
+              },
+            ],
+            headers: {
+              "Reply-To": "noreply@rapidemail.rmlconnect.net",
+              "X-Unique-Id": "id ",
+            },
           },
-        ],
-        headers: {
-          "Reply-To": "noreply@rapidemail.rmlconnect.net",
-          "X-Unique-Id": "id ",
-        },
-      },
-    });
+        });
 
-    const config = {
-      method: "post",
-      url: process.env.RAPID_MAILURL,
-      headers: {
-        "Reply-To": "message.reply@example.com",
-        "X-Unique-Id": "id",
-        "Content-Type": "application/json",
-      },
-      data: body,
-    };
+        const config = {
+          method: "post",
+          url: process.env.RAPID_MAILURL,
+          headers: {
+            "Reply-To": "message.reply@example.com",
+            "X-Unique-Id": "id",
+            "Content-Type": "application/json",
+          },
+          data: body,
+        };
 
-    const response = await axios(config);
+        const response = await axios(config);
 
-    console.log(response.data);
+        break;
+
+      default:
+        break;
+    }
+
     res.status(200).json({ email, uid: uid });
   } catch (e) {
     res.status(401).json({ error: "Mail not send" });
