@@ -253,7 +253,7 @@ module.exports.pharmacies = async (req, res) => {
   try {
     const options = {
       method: "GET",
-      url: "https://forward-reverse-geocoding.p.rapidapi.com/v1/reverse",
+      url: process.env.GEOCODING,
       params: {
         lat: lat,
         lon: long,
@@ -261,8 +261,8 @@ module.exports.pharmacies = async (req, res) => {
         polygon_threshold: "0.0",
       },
       headers: {
-        "x-rapidapi-host": "forward-reverse-geocoding.p.rapidapi.com",
-        "x-rapidapi-key": "2aa5e5eb32msh88f9422e4f8e2b1p1f38cbjsn6c608a4f3740",
+        "x-rapidapi-host": process.env.GEO_HOST,
+        "x-rapidapi-key": process.env.GEO_KEY,
       },
     };
 

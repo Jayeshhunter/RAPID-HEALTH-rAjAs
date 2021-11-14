@@ -11,6 +11,9 @@ require("dotenv").config();
 const rateLimit = require("express-rate-limit");
 const app = express();
 
+const server = require("http").Server(app);
+const io = require("socket.io")(server);
+
 app.use(methodOverride("_method"));
 
 mongoose.connect(process.env.MONGO_URL, {
@@ -53,7 +56,24 @@ app.use("/", routes);
 
 const port = process.env.PORT || 5000;
 
-app.listen(port, (err) => {
+io.on("connection", (socket) => {
+  socket.on("join-room", (room, user) => {
+    socket.join(room);
+    // console.log(room);
+    socket.broadcast
+      .to(room)
+      .emit("user-connected", `user connected ${room}`, room, user);
+
+    socket.on("disconnect", () => {
+      socket.broadcast.to(room).emit("user-disconnected", user);
+    });
+    socket.on("message", (msg) => {
+      socket.broadcast.to(room).emit("sending", msg);
+    });
+  });
+});
+
+server.listen(port, (err) => {
   if (err) console.log(err);
   else console.log("Server running on PORT:", port);
 });

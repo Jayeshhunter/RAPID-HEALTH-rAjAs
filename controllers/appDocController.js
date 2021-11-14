@@ -129,14 +129,9 @@ module.exports.addPrescription = async (req, res) => {
             },
             data: data2,
           };
-
           const resultAx = await Promise.all([axios(config), axios(config2)]);
-
-          // const response = await axios(config);
         }
       });
-
-      // console.log('running a task every minute');
     });
 
     res.status(200).json({ prescription: result[0] });

@@ -51,7 +51,7 @@ router.post("/forgot", authController.forgot_post);
 router.post("/reset/:email", authController.reset_post);
 router.post("/edit", docAuth.checkDoc, upload, authController.edit_post);
 router.post("/editWithout", docAuth.checkDoc, authController.editwithout_post);
-router.post("/verify", docAuth.checkDoc, authController.verify_post);
+router.get("/verify", docAuth.checkDoc, authController.verify_post);
 router.get("/image/:filename", authController.getImg);
 router.get("/doctor/:id", authController.getDoctor);
 
