@@ -72,7 +72,7 @@ module.exports.generate_otp = async (req, res) => {
 
     const response = await axios(config);
 
-    console.log(response.data);
+    // console.log(response.data);
     res.status(200).json({ email, uid: uid });
   } catch (e) {
     res.status(401).json({ error: "Mail not send" });
@@ -162,7 +162,7 @@ module.exports.login_post = async (req, res) => {
       }
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(400).json({ error: "user doesn't exist" });
   }
 };
@@ -214,7 +214,7 @@ module.exports.forgot_post = async (req, res) => {
 
     const response = await axios(config);
 
-    console.log(response.data);
+    // console.log(response.data);
     res.status(200).json({ message: "Mail sent", user, otp: uid });
   } catch (err) {
     res.status(400).json({ error: "Incorrect mailId" });
@@ -240,8 +240,6 @@ module.exports.reset_post = (req, res) => {
   });
 };
 module.exports.edit_post = async (req, res) => {
-  // const email = req.params.doc;
-  console.log(req.user);
   try {
     const user = await User.findOneAndUpdate(
       { email: req.user.email },
@@ -277,7 +275,7 @@ module.exports.editwithout_post = async (req, res) => {
         gender,
       }
     );
-    console.log(user);
+    // console.log(user);
     // const allPins = await Pin.find().sort({ createdAt: -1 });
     res.status(200).json({ user: user });
   } catch (err) {

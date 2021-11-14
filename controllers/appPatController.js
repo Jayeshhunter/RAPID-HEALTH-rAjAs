@@ -69,7 +69,7 @@ module.exports.getDocData = async (req, res) => {
       });
 
       appoin.sort((a, b) => (a.distance > b.distance ? 1 : -1));
-      console.log(appoin);
+      // console.log(appoin);
       res.status(200).json({ appointments: appoin });
     })
     .catch((err) => {
@@ -223,7 +223,7 @@ module.exports.getMyDisease = async (req, res) => {
           },
         };
         await axios(options).then((response) => {
-          console.log(response.data);
+          // console.log(response.data);
           res.status(200).json({ info: response.data });
         });
       });
