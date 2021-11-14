@@ -250,26 +250,26 @@ module.exports.history = async (req, res) => {
 
 module.exports.pharmacies = async (req, res) => {
   const { lat, long } = req.params;
-
-  const options = {
-    method: "GET",
-    url: "https://forward-reverse-geocoding.p.rapidapi.com/v1/reverse",
-    params: {
-      lat: lat,
-      lon: long,
-      "accept-language": "en",
-      polygon_threshold: "0.0",
-    },
-    headers: {
-      "x-rapidapi-host": "forward-reverse-geocoding.p.rapidapi.com",
-      "x-rapidapi-key": "2aa5e5eb32msh88f9422e4f8e2b1p1f38cbjsn6c608a4f3740",
-    },
-  };
-
-  const response = await axios(options);
-  // res.status(200).json({ data: response.data });
-  const location = response.data.address.city;
   try {
+    const options = {
+      method: "GET",
+      url: "https://forward-reverse-geocoding.p.rapidapi.com/v1/reverse",
+      params: {
+        lat: lat,
+        lon: long,
+        "accept-language": "en",
+        polygon_threshold: "0.0",
+      },
+      headers: {
+        "x-rapidapi-host": "forward-reverse-geocoding.p.rapidapi.com",
+        "x-rapidapi-key": "2aa5e5eb32msh88f9422e4f8e2b1p1f38cbjsn6c608a4f3740",
+      },
+    };
+
+    const response = await axios(options);
+    // res.status(200).json({ data: response.data });
+    const location = response.data.address.city;
+
     const config = {
       method: "GET",
       url: process.env.JD_URL,
